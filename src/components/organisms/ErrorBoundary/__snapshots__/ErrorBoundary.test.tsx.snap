@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ErrorBoundary should match snapshot when error occurs 1`] = `
+<div>
+  <div
+    class="flex min-h-screen items-center justify-center bg-background-dark p-4"
+  >
+    <div
+      class="max-w-md w-full rounded-lg border border-border-dark bg-surface-dark p-6"
+    >
+      <h2
+        class="text-2xl font-bold text-white mb-4"
+      >
+        Something went wrong
+      </h2>
+      <p
+        class="text-slate-400 mb-4"
+      >
+        An unexpected error occurred. Please try refreshing the page.
+      </p>
+      <details
+        class="mb-4"
+      >
+        <summary
+          class="cursor-pointer text-sm text-slate-400 mb-2"
+        >
+          Error details (dev only)
+        </summary>
+        <pre
+          class="text-xs bg-slate-800 p-2 rounded overflow-auto"
+        >
+          Error: Test error
+          
+
+
+          Error: Test error
+    at ThrowError (C:\\O\\GitHub\\tuval.space\\src\\components\\organisms\\ErrorBoundary\\ErrorBoundary.test.tsx:7:11)
+    at renderWithHooks (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react-dom@18.3.1_react@18.3.1\\node_modules\\react-dom\\cjs\\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react-dom@18.3.1_react@18.3.1\\node_modules\\react-dom\\cjs\\react-dom.development.js:20103:13)
+    at beginWork (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react-dom@18.3.1_react@18.3.1\\node_modules\\react-dom\\cjs\\react-dom.development.js:21626:16)
+    at beginWork$1 (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react-dom@18.3.1_react@18.3.1\\node_modules\\react-dom\\cjs\\react-dom.development.js:27465:14)
+    at performUnitOfWork (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react-dom@18.3.1_react@18.3.1\\node_modules\\react-dom\\cjs\\react-dom.development.js:26599:12)
+    at workLoopSync (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react-dom@18.3.1_react@18.3.1\\node_modules\\react-dom\\cjs\\react-dom.development.js:26505:5)
+    at renderRootSync (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react-dom@18.3.1_react@18.3.1\\node_modules\\react-dom\\cjs\\react-dom.development.js:26473:7)
+    at recoverFromConcurrentError (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react-dom@18.3.1_react@18.3.1\\node_modules\\react-dom\\cjs\\react-dom.development.js:25889:20)
+    at performConcurrentWorkOnRoot (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react-dom@18.3.1_react@18.3.1\\node_modules\\react-dom\\cjs\\react-dom.development.js:25789:22)
+    at flushActQueue (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react@18.3.1\\node_modules\\react\\cjs\\react.development.js:2667:24)
+    at act (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\react@18.3.1\\node_modules\\react\\cjs\\react.development.js:2582:11)
+    at C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\@testing-library+react@14.3.1_@types+react@18.3.27_react-dom@18.3.1_react@18.3.1\\node_modules\\@testing-library\\react\\dist\\act-compat.js:47:25
+    at renderRoot (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\@testing-library+react@14.3.1_@types+react@18.3.27_react-dom@18.3.1_react@18.3.1\\node_modules\\@testing-library\\react\\dist\\pure.js:180:26)
+    at render (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\@testing-library+react@14.3.1_@types+react@18.3.27_react-dom@18.3.1_react@18.3.1\\node_modules\\@testing-library\\react\\dist\\pure.js:271:10)
+    at Object.&lt;anonymous&gt; (C:\\O\\GitHub\\tuval.space\\src\\components\\organisms\\ErrorBoundary\\ErrorBoundary.test.tsx:28:33)
+    at Promise.then.completed (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-circus@29.7.0\\node_modules\\jest-circus\\build\\utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-circus@29.7.0\\node_modules\\jest-circus\\build\\utils.js:231:10)
+    at _callCircusTest (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-circus@29.7.0\\node_modules\\jest-circus\\build\\run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at _runTest (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-circus@29.7.0\\node_modules\\jest-circus\\build\\run.js:252:3)
+    at _runTestsForDescribeBlock (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-circus@29.7.0\\node_modules\\jest-circus\\build\\run.js:126:9)
+    at _runTestsForDescribeBlock (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-circus@29.7.0\\node_modules\\jest-circus\\build\\run.js:121:9)
+    at run (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-circus@29.7.0\\node_modules\\jest-circus\\build\\run.js:71:3)
+    at runAndTransformResultsToJestFormat (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-circus@29.7.0\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)
+    at jestAdapter (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-circus@29.7.0\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)
+    at runTestInternal (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-runner@29.7.0\\node_modules\\jest-runner\\build\\runTest.js:367:16)
+    at runTest (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-runner@29.7.0\\node_modules\\jest-runner\\build\\runTest.js:444:34)
+    at Object.worker (C:\\O\\GitHub\\tuval.space\\node_modules\\.pnpm\\jest-runner@29.7.0\\node_modules\\jest-runner\\build\\testWorker.js:106:12)
+        </pre>
+      </details>
+      <div
+        class="flex gap-2"
+      >
+        <button
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+        >
+          Try again
+        </button>
+        <button
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+        >
+          Refresh page
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ErrorBoundary should match snapshot when no error 1`] = `
+<div>
+  <div>
+    No error
+  </div>
+</div>
+`;
+
+exports[`ErrorBoundary should match snapshot with custom fallback 1`] = `
+<div>
+  <div>
+    Custom error
+  </div>
+</div>
+`;

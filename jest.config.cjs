@@ -13,13 +13,12 @@ module.exports = {
     '!src/**/*.d.ts',
     '!src/**/*.stories.tsx',
     '!src/main.tsx',
+    '!src/lib/__mocks__/**',
   ],
+  snapshotSerializers: [],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: {
-        jsx: 'react-jsx',
-      },
-    }],
+    '^.+\\.tsx?$': ['./jest-import-meta-transformer.cjs'],
+    '^.+\\.jsx?$': ['babel-jest'],
   },
 };
 

@@ -1,6 +1,7 @@
-import React from 'react';
 import type { Preview } from '@storybook/react';
 import '../src/index.css';
+import React from 'react';
+import { MockAuthProvider } from '../src/lib/__mocks__/auth-context';
 
 const preview: Preview = {
   parameters: {
@@ -8,29 +9,32 @@ const preview: Preview = {
     controls: {
       matchers: {
         color: /(background|color)$/i,
-        date: /Date$/,
+        date: /Date$/i,
       },
+    },
+    backgrounds: {
+      default: 'dark',
+      values: [
+        {
+          name: 'dark',
+          value: '#0f172a',
+        },
+        {
+          name: 'light',
+          value: '#ffffff',
+        },
+      ],
     },
   },
   decorators: [
     (Story) => (
-      <div className="min-h-screen bg-background p-8">
-        <Story />
+      <div className="dark">
+        <MockAuthProvider>
+          <Story />
+        </MockAuthProvider>
       </div>
     ),
   ],
 };
 
 export default preview;
-
-
-
-
-
-
-
-
-
-
-
-

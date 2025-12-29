@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { COLOR_PALETTES, getPaletteById, type ColorPalette } from '@/components/ColorPicker';
+import { Button } from '@/components/atoms/ui/button';
+import { Input } from '@/components/atoms/ui/input';
+import { Label } from '@/components/atoms/ui/label';
+import {
+  COLOR_PALETTES,
+  getPaletteById,
+  type ColorPalette,
+} from '@/components/molecules/ColorPicker';
 import { logPageView } from '@/services/analytics.service';
 
 // Convert hex color to RGB
@@ -20,7 +24,10 @@ function hexToRgb(hex: string): [number, number, number] {
 }
 
 // Calculate Euclidean distance between two RGB colors
-function colorDistance(rgb1: [number, number, number], rgb2: [number, number, number]): number {
+function colorDistance(
+  rgb1: [number, number, number],
+  rgb2: [number, number, number]
+): number {
   const [r1, g1, b1] = rgb1;
   const [r2, g2, b2] = rgb2;
   return Math.sqrt((r2 - r1) ** 2 + (g2 - g1) ** 2 + (b2 - b1) ** 2);
@@ -51,20 +58,28 @@ export const ImportPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const originalImageRef = useRef<HTMLImageElement | null>(null);
-  
+
   const [selectedPaletteId, setSelectedPaletteId] = useState<string>('classic');
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [pixelArray, setPixelArray] = useState<string[][] | null>(null);
-  const [originalPixelArray, setOriginalPixelArray] = useState<string[][] | null>(null);
-  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [originalPixelArray, setOriginalPixelArray] = useState<
+    string[][] | null
+  >(null);
+  const [imageDimensions, setImageDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const [zoomLevel, setZoomLevel] = useState(2);
-  const [colorMapping, setColorMapping] = useState<Map<string, string>>(new Map());
+  const [colorMapping, setColorMapping] = useState<Map<string, string>>(
+    new Map()
+  );
   const [uniqueColors, setUniqueColors] = useState<string[]>([]);
   const [showColorMapping, setShowColorMapping] = useState(false);
   const [customPaletteName, setCustomPaletteName] = useState('');
   const [imagePalette, setImagePalette] = useState<ColorPalette | null>(null);
-  const [reducedImagePalette, setReducedImagePalette] = useState<ColorPalette | null>(null);
+  const [reducedImagePalette, setReducedImagePalette] =
+    useState<ColorPalette | null>(null);
   const [draggedColor, setDraggedColor] = useState<string | null>(null);
   const [dragOverGroup, setDragOverGroup] = useState<string | null>(null);
 
@@ -76,6 +91,7 @@ export const ImportPage = () => {
     if (pixelArray && previewCanvasRef.current) {
       drawPreview();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pixelArray, zoomLevel, colorMapping]);
 
   // Extract unique colors from originalPixelArray (only once, when image is first processed)
@@ -84,6 +100,7 @@ export const ImportPage = () => {
       const unique = Array.from(new Set(originalPixelArray.flat()));
       setUniqueColors(unique.sort());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [originalPixelArray]);
 
   // Update color mapping when palette changes (but keep uniqueColors unchanged)
@@ -101,10 +118,11 @@ export const ImportPage = () => {
         return;
       }
 
-      const palette = selectedPaletteId === 'image-palette-reduced'
-        ? reducedImagePalette
-        : getPaletteById(selectedPaletteId);
-      
+      const palette =
+        selectedPaletteId === 'image-palette-reduced'
+          ? reducedImagePalette
+          : getPaletteById(selectedPaletteId);
+
       if (palette) {
         // Map each unique color to closest palette color
         const newMapping = new Map<string, string>();
@@ -114,7 +132,7 @@ export const ImportPage = () => {
           newMapping.set(originalColor, closestPaletteColor);
         });
         setColorMapping(newMapping);
-        
+
         // Update pixel array with mappings
         const updatedArray = originalPixelArray.map((row) =>
           row.map((color) => newMapping.get(color) || color)
@@ -122,9 +140,17 @@ export const ImportPage = () => {
         setPixelArray(updatedArray);
       }
     }
-  }, [selectedPaletteId, imagePalette, reducedImagePalette, uniqueColors, originalPixelArray]);
+  }, [
+    selectedPaletteId,
+    imagePalette,
+    reducedImagePalette,
+    uniqueColors,
+    originalPixelArray,
+  ]);
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -170,7 +196,9 @@ export const ImportPage = () => {
 
       URL.revokeObjectURL(imageUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Resim işlenirken bir hata oluştu');
+      setError(
+        err instanceof Error ? err.message : 'Resim işlenirken bir hata oluştu'
+      );
       setPixelArray(null);
       setImageDimensions(null);
     } finally {
@@ -208,12 +236,13 @@ export const ImportPage = () => {
         const g = data[idx + 1];
         const b = data[idx + 2];
         const a = data[idx + 3];
-        
+
         // Skip fully transparent pixels
         if (a < 128) continue;
-        
+
         // Convert to hex
-        const hex = `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
+        const hex =
+          `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
         colorSet.add(hex);
       }
     }
@@ -228,7 +257,11 @@ export const ImportPage = () => {
     };
   };
 
-  const processImageWithCustomPalette = async (image: HTMLImageElement, palette: ColorPalette, useOriginalColors = false) => {
+  const processImageWithCustomPalette = async (
+    image: HTMLImageElement,
+    palette: ColorPalette,
+    useOriginalColors = false
+  ) => {
     const width = image.width;
     const height = image.height;
 
@@ -268,7 +301,8 @@ export const ImportPage = () => {
 
         if (useOriginalColors) {
           // Use original color directly
-          color = `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
+          color =
+            `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
           rgb = [r, g, b];
         } else {
           // Find closest palette color
@@ -406,18 +440,23 @@ export const ImportPage = () => {
   // Get color mappings: original color => mapped color (only calculate when menu is open)
   const colorMappings = useMemo(() => {
     if (!showColorMapping) return [];
-    return uniqueColors.map((originalColor) => ({
-      originalColor,
-      mappedColor: colorMapping.get(originalColor) || originalColor,
-    })).sort((a, b) => a.originalColor.localeCompare(b.originalColor));
+    return uniqueColors
+      .map((originalColor) => ({
+        originalColor,
+        mappedColor: colorMapping.get(originalColor) || originalColor,
+      }))
+      .sort((a, b) => a.originalColor.localeCompare(b.originalColor));
   }, [showColorMapping, uniqueColors, colorMapping]);
 
   // Handle single color mapping change
-  const handleColorMappingChange = (originalColor: string, newColor: string) => {
+  const handleColorMappingChange = (
+    originalColor: string,
+    newColor: string
+  ) => {
     const newMapping = new Map(colorMapping);
     newMapping.set(originalColor, newColor);
     setColorMapping(newMapping);
-    
+
     // Update pixel array with all mappings applied
     if (originalPixelArray) {
       const updatedArray = originalPixelArray.map((row) =>
@@ -459,12 +498,13 @@ export const ImportPage = () => {
 
   const handleResetColorMapping = () => {
     if (originalPixelArray && uniqueColors.length > 0) {
-      const palette = selectedPaletteId === 'image-palette' 
-        ? imagePalette 
-        : selectedPaletteId === 'image-palette-reduced'
-        ? reducedImagePalette
-        : getPaletteById(selectedPaletteId);
-      
+      const palette =
+        selectedPaletteId === 'image-palette'
+          ? imagePalette
+          : selectedPaletteId === 'image-palette-reduced'
+            ? reducedImagePalette
+            : getPaletteById(selectedPaletteId);
+
       if (palette) {
         // Reset mapping to closest palette colors
         const newMapping = new Map<string, string>();
@@ -474,7 +514,7 @@ export const ImportPage = () => {
           newMapping.set(originalColor, closestPaletteColor);
         });
         setColorMapping(newMapping);
-        
+
         // Update pixel array with mappings
         const updatedArray = originalPixelArray.map((row) =>
           row.map((color) => newMapping.get(color) || color)
@@ -493,7 +533,11 @@ export const ImportPage = () => {
   };
 
   // K-means clustering to reduce colors to 8
-  const kMeans = (colors: string[], k: number, maxIterations = 10): string[] => {
+  const kMeans = (
+    colors: string[],
+    k: number,
+    maxIterations = 10
+  ): string[] => {
     if (colors.length <= k) {
       return colors;
     }
@@ -515,12 +559,14 @@ export const ImportPage = () => {
     // K-means iterations
     for (let iteration = 0; iteration < maxIterations; iteration++) {
       // Assign each color to nearest centroid
-      const clusters: number[][] = Array(k).fill(0).map(() => []);
-      
+      const clusters: number[][] = Array(k)
+        .fill(0)
+        .map(() => []);
+
       colorRgbs.forEach((rgb, idx) => {
         let minDistance = Infinity;
         let nearestCentroid = 0;
-        
+
         centroids.forEach((centroid, cIdx) => {
           const distance = colorDistance(rgb, centroid);
           if (distance < minDistance) {
@@ -528,7 +574,7 @@ export const ImportPage = () => {
             nearestCentroid = cIdx;
           }
         });
-        
+
         clusters[nearestCentroid].push(idx);
       });
 
@@ -536,27 +582,29 @@ export const ImportPage = () => {
       let centroidsChanged = false;
       clusters.forEach((cluster, cIdx) => {
         if (cluster.length === 0) return; // Skip empty clusters
-        
-        let sumR = 0, sumG = 0, sumB = 0;
+
+        let sumR = 0,
+          sumG = 0,
+          sumB = 0;
         cluster.forEach((colorIdx) => {
           const rgb = colorRgbs[colorIdx];
           sumR += rgb[0];
           sumG += rgb[1];
           sumB += rgb[2];
         });
-        
+
         const newCentroid: [number, number, number] = [
           Math.round(sumR / cluster.length),
           Math.round(sumG / cluster.length),
           Math.round(sumB / cluster.length),
         ];
-        
+
         // Check if centroid changed
         const oldCentroid = centroids[cIdx];
         if (colorDistance(oldCentroid, newCentroid) > 0.1) {
           centroidsChanged = true;
         }
-        
+
         centroids[cIdx] = newCentroid;
       });
 
@@ -608,7 +656,7 @@ export const ImportPage = () => {
     }
 
     const mappedColors = Array.from(new Set(colorMapping.values()));
-    
+
     if (mappedColors.length === 0) {
       setError('En az bir renk olmalı');
       return;
@@ -640,13 +688,14 @@ export const ImportPage = () => {
     if (!originalPixelArray || uniqueColors.length === 0) return;
 
     setSelectedPaletteId(newPaletteId);
-    
-    const palette = newPaletteId === 'image-palette' 
-      ? imagePalette 
-      : newPaletteId === 'image-palette-reduced'
-      ? reducedImagePalette
-      : getPaletteById(newPaletteId);
-    
+
+    const palette =
+      newPaletteId === 'image-palette'
+        ? imagePalette
+        : newPaletteId === 'image-palette-reduced'
+          ? reducedImagePalette
+          : getPaletteById(newPaletteId);
+
     if (palette) {
       // Map each unique color to closest palette color
       const newMapping = new Map<string, string>();
@@ -656,7 +705,7 @@ export const ImportPage = () => {
         newMapping.set(originalColor, closestPaletteColor);
       });
       setColorMapping(newMapping);
-      
+
       // Update pixel array with mappings
       const updatedArray = originalPixelArray.map((row) =>
         row.map((color) => newMapping.get(color) || color)
@@ -674,11 +723,12 @@ export const ImportPage = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const palette = selectedPaletteId === 'image-palette' 
-        ? imagePalette 
-        : selectedPaletteId === 'image-palette-reduced'
-        ? reducedImagePalette
-        : getPaletteById(selectedPaletteId);
+      const palette =
+        selectedPaletteId === 'image-palette'
+          ? imagePalette
+          : selectedPaletteId === 'image-palette-reduced'
+            ? reducedImagePalette
+            : getPaletteById(selectedPaletteId);
       const paletteName = palette?.id || 'custom';
       a.download = `image-${paletteName}-${Date.now()}.png`;
       document.body.appendChild(a);
@@ -696,11 +746,12 @@ export const ImportPage = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const palette = selectedPaletteId === 'image-palette' 
-      ? imagePalette 
-      : selectedPaletteId === 'image-palette-reduced'
-      ? reducedImagePalette
-      : getPaletteById(selectedPaletteId);
+    const palette =
+      selectedPaletteId === 'image-palette'
+        ? imagePalette
+        : selectedPaletteId === 'image-palette-reduced'
+          ? reducedImagePalette
+          : getPaletteById(selectedPaletteId);
     const paletteName = palette?.id || 'custom';
     a.download = `image-${paletteName}-${Date.now()}.json`;
     document.body.appendChild(a);
@@ -726,7 +777,12 @@ export const ImportPage = () => {
     if (previewCanvasRef.current) {
       const ctx = previewCanvasRef.current.getContext('2d');
       if (ctx) {
-        ctx.clearRect(0, 0, previewCanvasRef.current.width, previewCanvasRef.current.height);
+        ctx.clearRect(
+          0,
+          0,
+          previewCanvasRef.current.width,
+          previewCanvasRef.current.height
+        );
       }
     }
   };
@@ -735,20 +791,26 @@ export const ImportPage = () => {
     ? `${imageDimensions.width} × ${imageDimensions.height}`
     : '—';
 
-  const selectedPalette = selectedPaletteId === 'image-palette' 
-    ? imagePalette 
-    : selectedPaletteId === 'image-palette-reduced'
-    ? reducedImagePalette
-    : getPaletteById(selectedPaletteId);
+  const selectedPalette =
+    selectedPaletteId === 'image-palette'
+      ? imagePalette
+      : selectedPaletteId === 'image-palette-reduced'
+        ? reducedImagePalette
+        : getPaletteById(selectedPaletteId);
 
   return (
     <div className="min-h-screen bg-background-dark text-white font-['Space_Grotesk',sans-serif]">
       {/* Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-solid border-border-dark bg-background-dark/80 backdrop-blur-md">
         <div className="flex items-center justify-between whitespace-nowrap px-4 py-3 max-w-[1200px] mx-auto w-full">
-          <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate('/')}>
+          <div
+            className="flex items-center gap-4 cursor-pointer"
+            onClick={() => navigate('/')}
+          >
             <img src="/logo.svg" alt="tuval.space logo" className="size-8" />
-            <h2 className="text-lg font-bold leading-tight tracking-tight">tuval.space</h2>
+            <h2 className="text-lg font-bold leading-tight tracking-tight">
+              tuval.space
+            </h2>
           </div>
           <Button variant="ghost" onClick={() => navigate('/')}>
             Ana Sayfa
@@ -781,7 +843,11 @@ export const ImportPage = () => {
                     className="flex-1"
                   />
                   {pixelArray && (
-                    <Button variant="outline" onClick={handleClear} disabled={isProcessing}>
+                    <Button
+                      variant="outline"
+                      onClick={handleClear}
+                      disabled={isProcessing}
+                    >
                       Temizle
                     </Button>
                   )}
@@ -790,7 +856,9 @@ export const ImportPage = () => {
                   <p className="text-sm text-destructive mt-2">{error}</p>
                 )}
                 {isProcessing && (
-                  <p className="text-sm text-muted-foreground mt-2">İşleniyor...</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    İşleniyor...
+                  </p>
                 )}
               </div>
 
@@ -825,7 +893,9 @@ export const ImportPage = () => {
                         {/* Palette Colors - Drag Source */}
                         {selectedPalette && (
                           <div className="mb-4 pb-4 border-b border-slate-700">
-                            <Label className="text-xs mb-2 block">Yeni Palet Renkleri (Sürükle)</Label>
+                            <Label className="text-xs mb-2 block">
+                              Yeni Palet Renkleri (Sürükle)
+                            </Label>
                             <div className="flex flex-wrap gap-2">
                               {selectedPalette.colors.map((color) => (
                                 <div
@@ -854,7 +924,9 @@ export const ImportPage = () => {
                             return (
                               <div
                                 key={mappingKey}
-                                onDragOver={(e) => handleDragOver(e, mappingKey)}
+                                onDragOver={(e) =>
+                                  handleDragOver(e, mappingKey)
+                                }
                                 onDragLeave={handleDragLeave}
                                 onDrop={() => handleDrop(mapping.originalColor)}
                                 className={`p-3 rounded border-2 border-dashed bg-slate-900 transition-all ${
@@ -868,33 +940,52 @@ export const ImportPage = () => {
                                   <div className="flex items-center gap-2">
                                     <div
                                       className="w-12 h-12 rounded border-2 border-slate-600 flex-shrink-0"
-                                      style={{ backgroundColor: mapping.originalColor }}
+                                      style={{
+                                        backgroundColor: mapping.originalColor,
+                                      }}
                                       title={mapping.originalColor}
                                     />
                                     <div>
-                                      <p className="text-xs font-medium mb-0.5">Eski Renk</p>
-                                      <p className="text-xs font-mono text-muted-foreground">{mapping.originalColor}</p>
+                                      <p className="text-xs font-medium mb-0.5">
+                                        Eski Renk
+                                      </p>
+                                      <p className="text-xs font-mono text-muted-foreground">
+                                        {mapping.originalColor}
+                                      </p>
                                     </div>
                                   </div>
 
                                   {/* Arrow */}
-                                  <span className="text-slate-400 text-xl">→</span>
+                                  <span className="text-slate-400 text-xl">
+                                    →
+                                  </span>
 
                                   {/* Mapped Color (Yeni Renk) */}
                                   <div className="flex items-center gap-2 flex-1">
                                     <div
                                       className="w-12 h-12 rounded border-2 border-slate-600 flex-shrink-0"
-                                      style={{ backgroundColor: mapping.mappedColor }}
+                                      style={{
+                                        backgroundColor: mapping.mappedColor,
+                                      }}
                                       title={mapping.mappedColor}
                                     />
                                     <div className="flex-1">
-                                      <p className="text-xs font-medium mb-0.5">Yeni Renk</p>
-                                      <p className="text-xs font-mono text-muted-foreground">{mapping.mappedColor}</p>
+                                      <p className="text-xs font-medium mb-0.5">
+                                        Yeni Renk
+                                      </p>
+                                      <p className="text-xs font-mono text-muted-foreground">
+                                        {mapping.mappedColor}
+                                      </p>
                                     </div>
                                     <Input
                                       type="color"
                                       value={mapping.mappedColor}
-                                      onChange={(e) => handleColorMappingChange(mapping.originalColor, e.target.value)}
+                                      onChange={(e) =>
+                                        handleColorMappingChange(
+                                          mapping.originalColor,
+                                          e.target.value
+                                        )
+                                      }
                                       className="w-16 h-10 cursor-pointer"
                                     />
                                   </div>
@@ -910,7 +1001,9 @@ export const ImportPage = () => {
                               type="text"
                               placeholder="Palet ismi..."
                               value={customPaletteName}
-                              onChange={(e) => setCustomPaletteName(e.target.value)}
+                              onChange={(e) =>
+                                setCustomPaletteName(e.target.value)
+                              }
                               className="flex-1"
                             />
                             <Button
@@ -930,7 +1023,9 @@ export const ImportPage = () => {
 
                   <div className="space-y-2">
                     <Label>Boyutlar</Label>
-                    <p className="text-sm text-muted-foreground">{dimensions} piksel</p>
+                    <p className="text-sm text-muted-foreground">
+                      {dimensions} piksel
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -945,7 +1040,9 @@ export const ImportPage = () => {
                         onChange={(e) => setZoomLevel(Number(e.target.value))}
                         className="flex-1"
                       />
-                      <span className="text-sm w-16 text-right">{zoomLevel}x</span>
+                      <span className="text-sm w-16 text-right">
+                        {zoomLevel}x
+                      </span>
                     </div>
                   </div>
 
@@ -956,11 +1053,14 @@ export const ImportPage = () => {
                         Seçili: <strong>{selectedPalette.name}</strong>
                       </p>
                     )}
-                    
+
                     {/* Image Palette */}
                     {imagePalette && (
                       <div className="mb-3">
-                        <p className="text-xs font-medium mb-2" style={{ color: '#929bc9' }}>
+                        <p
+                          className="text-xs font-medium mb-2"
+                          style={{ color: '#929bc9' }}
+                        >
                           Görsel Paleti ({imagePalette.colors.length} renk)
                         </p>
                         <button
@@ -974,17 +1074,22 @@ export const ImportPage = () => {
                           } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           <div className="flex flex-wrap gap-1 justify-center">
-                            {imagePalette.colors.slice(0,16).map((color, idx) => (
-                              <div
-                                key={idx}
-                                className="w-6 h-6 rounded border border-slate-600"
-                                style={{ backgroundColor: color }}
-                                title={color}
-                              />
-                            ))}
+                            {imagePalette.colors
+                              .slice(0, 16)
+                              .map((color, idx) => (
+                                <div
+                                  key={idx}
+                                  className="w-6 h-6 rounded border border-slate-600"
+                                  style={{ backgroundColor: color }}
+                                  title={color}
+                                />
+                              ))}
                           </div>
                           {imagePalette.colors.length > 16 ? '...' : ''}
-                          <p className="text-xs mt-2 text-center font-medium" style={{ color: '#929bc9' }}>
+                          <p
+                            className="text-xs mt-2 text-center font-medium"
+                            style={{ color: '#929bc9' }}
+                          >
                             {imagePalette.name}
                           </p>
                         </button>
@@ -994,12 +1099,18 @@ export const ImportPage = () => {
                     {/* Reduced Image Palette */}
                     {reducedImagePalette && (
                       <div className="mb-3">
-                        <p className="text-xs font-medium mb-2" style={{ color: '#929bc9' }}>
-                          {reducedImagePalette.name} ({reducedImagePalette.colors.length} renk)
+                        <p
+                          className="text-xs font-medium mb-2"
+                          style={{ color: '#929bc9' }}
+                        >
+                          {reducedImagePalette.name} (
+                          {reducedImagePalette.colors.length} renk)
                         </p>
                         <button
                           type="button"
-                          onClick={() => handlePaletteChange('image-palette-reduced')}
+                          onClick={() =>
+                            handlePaletteChange('image-palette-reduced')
+                          }
                           disabled={isProcessing}
                           className={`w-full p-3 rounded-lg border-2 transition-all ${
                             selectedPaletteId === 'image-palette-reduced'
@@ -1017,7 +1128,10 @@ export const ImportPage = () => {
                               />
                             ))}
                           </div>
-                          <p className="text-xs mt-2 text-center font-medium" style={{ color: '#929bc9' }}>
+                          <p
+                            className="text-xs mt-2 text-center font-medium"
+                            style={{ color: '#929bc9' }}
+                          >
                             {reducedImagePalette.name}
                           </p>
                         </button>
@@ -1047,7 +1161,10 @@ export const ImportPage = () => {
                               />
                             ))}
                           </div>
-                          <p className="text-xs mt-1 text-center font-medium" style={{ color: '#929bc9' }}>
+                          <p
+                            className="text-xs mt-1 text-center font-medium"
+                            style={{ color: '#929bc9' }}
+                          >
                             {palette.name}
                           </p>
                         </button>
@@ -1067,16 +1184,26 @@ export const ImportPage = () => {
                         Create Palette
                       </Button>
                       <p className="text-xs text-muted-foreground">
-                        Görsel paletinden 8 renge indirgenmiş yeni bir palet oluşturur
+                        Görsel paletinden 8 renge indirgenmiş yeni bir palet
+                        oluşturur
                       </p>
                     </div>
                   )}
 
                   <div className="flex gap-2">
-                    <Button onClick={handleDownloadPNG} className="flex-1" disabled={isProcessing}>
+                    <Button
+                      onClick={handleDownloadPNG}
+                      className="flex-1"
+                      disabled={isProcessing}
+                    >
                       PNG İndir
                     </Button>
-                    <Button onClick={handleDownloadJSON} variant="outline" className="flex-1" disabled={isProcessing}>
+                    <Button
+                      onClick={handleDownloadJSON}
+                      variant="outline"
+                      className="flex-1"
+                      disabled={isProcessing}
+                    >
                       JSON İndir
                     </Button>
                   </div>
@@ -1103,7 +1230,9 @@ export const ImportPage = () => {
                 ) : (
                   <div className="text-center text-muted-foreground py-12">
                     <p className="mb-2">Henüz resim yüklenmedi</p>
-                    <p className="text-sm">Resim dosyası seçin (jpg, png, vb.)</p>
+                    <p className="text-sm">
+                      Resim dosyası seçin (jpg, png, vb.)
+                    </p>
                   </div>
                 )}
               </div>
@@ -1115,7 +1244,10 @@ export const ImportPage = () => {
                 <div className="text-sm space-y-1 text-muted-foreground">
                   <p>Genişlik: {imageDimensions.width} px</p>
                   <p>Yükseklik: {imageDimensions.height} px</p>
-                  <p>Toplam piksel: {imageDimensions.width * imageDimensions.height}</p>
+                  <p>
+                    Toplam piksel:{' '}
+                    {imageDimensions.width * imageDimensions.height}
+                  </p>
                   <p>Palet: {selectedPalette?.name || '—'}</p>
                 </div>
               </div>
@@ -1130,23 +1262,29 @@ export const ImportPage = () => {
             <div>
               <p className="font-semibold mb-1">Nasıl Çalışır:</p>
               <p className="text-muted-foreground">
-                1. Bir resim dosyası yükleyin (JPG, PNG, vb.)<br />
-                2. Resim otomatik olarak seçili palete uydurulur<br />
-                3. Farklı paletler deneyebilirsiniz<br />
+                1. Bir resim dosyası yükleyin (JPG, PNG, vb.)
+                <br />
+                2. Resim otomatik olarak seçili palete uydurulur
+                <br />
+                3. Farklı paletler deneyebilirsiniz
+                <br />
                 4. PNG veya JSON formatında indirebilirsiniz
               </p>
             </div>
             <div>
               <p className="font-semibold mb-1">Palet Seçimi:</p>
               <p className="text-muted-foreground">
-                Resim yüklendikten sonra farklı paletler seçerek sonucu görebilirsiniz. Her palet değişikliğinde resim yeniden işlenir.
+                Resim yüklendikten sonra farklı paletler seçerek sonucu
+                görebilirsiniz. Her palet değişikliğinde resim yeniden işlenir.
               </p>
             </div>
             <div>
               <p className="font-semibold mb-1">İndirme:</p>
               <p className="text-muted-foreground">
-                PNG: Palete uydurulmuş görseli PNG formatında indirir<br />
-                JSON: 2D array formatında hex renk değerlerini JSON dosyası olarak indirir
+                PNG: Palete uydurulmuş görseli PNG formatında indirir
+                <br />
+                JSON: 2D array formatında hex renk değerlerini JSON dosyası
+                olarak indirir
               </p>
             </div>
           </div>

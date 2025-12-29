@@ -14,7 +14,11 @@ const isAnalyticsAvailable = (): boolean => {
 /**
  * Log a page view event
  */
-export const logPageView = (pageName: string, additionalParams?: Record<string, any>) => {
+export const logPageView = (
+  pageName: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  additionalParams?: Record<string, any>
+) => {
   if (!isAnalyticsAvailable()) return;
 
   try {
@@ -35,6 +39,7 @@ export const logPageView = (pageName: string, additionalParams?: Record<string, 
 export const logButtonClick = (
   buttonName: string,
   buttonLocation?: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   additionalParams?: Record<string, any>
 ) => {
   if (!isAnalyticsAvailable()) return;
@@ -57,6 +62,7 @@ export const logError = (
   errorName: string,
   errorMessage: string,
   errorLocation?: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   additionalParams?: Record<string, any>
 ) => {
   if (!isAnalyticsAvailable()) return;
@@ -107,6 +113,7 @@ export const setAnalyticsUserProperties = (user: User) => {
  */
 export const logCustomEvent = (
   eventName: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: Record<string, any>
 ) => {
   if (!isAnalyticsAvailable()) return;
@@ -117,9 +124,3 @@ export const logCustomEvent = (
     console.error('Error logging custom event:', error);
   }
 };
-
-
-
-
-
-

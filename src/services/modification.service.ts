@@ -12,7 +12,7 @@ import {
 import { db, getDocs } from '@/lib/firebase';
 import { DenseModification, Pixel, Board } from '@/types';
 import { getBoard } from './board.service';
-import { COLOR_PALETTES } from '@/components/ColorPicker';
+import { COLOR_PALETTES } from '@/components/molecules/ColorPicker';
 import pako from 'pako';
 
 /**
@@ -80,13 +80,15 @@ const base36ToIndex = (char: string): number | null => {
     return null; // Transparent
   }
   const code = char.charCodeAt(0);
-  if (code >= 49 && code <= 56) { // '1'-'8'
+  if (code >= 49 && code <= 56) {
+    // '1'-'8'
     return code - 49; // 0-7
   }
   if (char === '9') {
     return 8;
   }
-  if (code >= 97 && code <= 122) { // 'a'-'z'
+  if (code >= 97 && code <= 122) {
+    // 'a'-'z'
     return code - 97 + 9; // 9-34
   }
   // Invalid character, return transparent
@@ -104,7 +106,10 @@ export const colorToBase36Index = (color: string, board: Board): string => {
 /**
  * Convert base36 character to color
  */
-export const base36IndexToColor = (base36Char: string, board: Board): string | null => {
+export const base36IndexToColor = (
+  base36Char: string,
+  board: Board
+): string | null => {
   const index = base36ToIndex(base36Char);
   if (index === null) {
     return null; // Transparent
@@ -121,10 +126,15 @@ export const base36IndexToColor = (base36Char: string, board: Board): string | n
 export const encodePixelsToBase36 = (
   pixels: (string | number | null)[],
   board: Board
-): { compressed: string; originalSize: number; compressedSize: number; ratio: number } => {
+): {
+  compressed: string;
+  originalSize: number;
+  compressedSize: number;
+  ratio: number;
+} => {
   // First, create base36 string
   let base36String = '';
-  
+
   for (const pixel of pixels) {
     if (pixel === null) {
       base36String += '0'; // Transparent
@@ -137,19 +147,19 @@ export const encodePixelsToBase36 = (
       base36String += indexToBase36(index);
     }
   }
-  
+
   const originalSize = base36String.length;
-  
+
   // Compress with gzip (level 9 = maximum compression)
   const compressed = pako.gzip(base36String, { level: 9 });
-  
+
   // Convert to base64 string for storage
   const base64 = btoa(String.fromCharCode(...compressed));
   const compressedSize = base64.length;
-  
+
   // Calculate compression ratio (original / compressed)
   const ratio = originalSize > 0 ? (originalSize / compressedSize) * 100 : 0;
-  
+
   return {
     compressed: base64,
     originalSize,
@@ -174,19 +184,19 @@ export const decodePixelsFromBase36 = (
   for (let i = 0; i < binaryString.length; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
-  
+
   // Decompress gzip
   const decompressed = pako.ungzip(bytes, { to: 'string' });
-  
+
   // Now decode base36 string to colors
   const result: (string | null)[] = [];
-  
+
   for (let i = 0; i < decompressed.length; i++) {
     const char = decompressed[i];
     const color = base36IndexToColor(char, board);
     result.push(color);
   }
-  
+
   return result;
 };
 
@@ -207,7 +217,9 @@ export const createDenseModification = async (
   try {
     // Validate pixels array length
     if (pixels.length !== w * h) {
-      throw new Error(`Pixels array length (${pixels.length}) must equal w * h (${w * h})`);
+      throw new Error(
+        `Pixels array length (${pixels.length}) must equal w * h (${w * h})`
+      );
     }
 
     // Get board to encode pixels
@@ -223,10 +235,14 @@ export const createDenseModification = async (
     // Log compression stats
     if (encodingResult.originalSize > 0) {
       const compressionPercent = encodingResult.ratio.toFixed(1);
-      const savings = ((encodingResult.originalSize - encodingResult.compressedSize) / encodingResult.originalSize * 100).toFixed(1);
+      const savings = (
+        ((encodingResult.originalSize - encodingResult.compressedSize) /
+          encodingResult.originalSize) *
+        100
+      ).toFixed(1);
       console.log(
         `[Compression] ${encodingResult.originalSize} => ${encodingResult.compressedSize} chars ` +
-        `(${compressionPercent}% ratio, ${savings}% savings)`
+          `(${compressionPercent}% ratio, ${savings}% savings)`
       );
     }
 
@@ -251,7 +267,13 @@ export const createDenseModification = async (
       createdAt: now,
     };
 
-    const modificationRef = doc(db, 'boards', boardId, 'dense_modifications', modificationId);
+    const modificationRef = doc(
+      db,
+      'boards',
+      boardId,
+      'dense_modifications',
+      modificationId
+    );
     await setDoc(modificationRef, modification);
 
     return modification;
@@ -269,7 +291,12 @@ export const getBoardModifications = async (
   limitCount: number = 50
 ): Promise<DenseModification[]> => {
   try {
-    const modificationsRef = collection(db, 'boards', boardId, 'dense_modifications');
+    const modificationsRef = collection(
+      db,
+      'boards',
+      boardId,
+      'dense_modifications'
+    );
     const q = query(
       modificationsRef,
       orderBy('createdAt', 'desc'),
@@ -292,7 +319,12 @@ export const getModificationsSince = async (
   sinceTimestamp: Timestamp
 ): Promise<DenseModification[]> => {
   try {
-    const modificationsRef = collection(db, 'boards', boardId, 'dense_modifications');
+    const modificationsRef = collection(
+      db,
+      'boards',
+      boardId,
+      'dense_modifications'
+    );
     const q = query(
       modificationsRef,
       where('createdAt', '>=', sinceTimestamp),
@@ -316,7 +348,12 @@ export const getUserModifications = async (
   limitCount: number = 50
 ): Promise<DenseModification[]> => {
   try {
-    const modificationsRef = collection(db, 'boards', boardId, 'dense_modifications');
+    const modificationsRef = collection(
+      db,
+      'boards',
+      boardId,
+      'dense_modifications'
+    );
     const q = query(
       modificationsRef,
       where('userId', '==', userId),
@@ -349,7 +386,12 @@ export const replayModifications = async (
       .map(() => Array(width).fill(null));
 
     // Get all modifications
-    const modificationsRef = collection(db, 'boards', boardId, 'dense_modifications');
+    const modificationsRef = collection(
+      db,
+      'boards',
+      boardId,
+      'dense_modifications'
+    );
     let q = query(modificationsRef, orderBy('createdAt', 'asc'));
 
     if (untilTimestamp) {
@@ -361,7 +403,9 @@ export const replayModifications = async (
     }
 
     const querySnapshot = await getDocs(q);
-    const modifications = querySnapshot.docs.map((doc) => doc.data() as DenseModification);
+    const modifications = querySnapshot.docs.map(
+      (doc) => doc.data() as DenseModification
+    );
 
     // Get board once to check for customPalette
     const boardData = await getBoard(boardId);
@@ -377,7 +421,12 @@ export const replayModifications = async (
       }
 
       // Skip if modification is outside board bounds
-      if (mod.x + mod.w < 0 || mod.x >= width || mod.y + mod.h < 0 || mod.y >= height) {
+      if (
+        mod.x + mod.w < 0 ||
+        mod.x >= width ||
+        mod.y + mod.h < 0 ||
+        mod.y >= height
+      ) {
         continue;
       }
 
@@ -422,7 +471,9 @@ export const replayModifications = async (
 /**
  * Get modification count (number of changed pixels) for a dense modification
  */
-export const getModificationCount = (modification: DenseModification): number => {
+export const getModificationCount = (
+  modification: DenseModification
+): number => {
   return modification.changedPixelsCount;
 };
 
@@ -444,16 +495,31 @@ export const toggleModificationEnabled = async (
     }
 
     if (board.ownerId !== userId) {
-      return { success: false, error: 'Only board owner can toggle modifications' };
+      return {
+        success: false,
+        error: 'Only board owner can toggle modifications',
+      };
     }
 
     // Update the modification's enabled field
-    const modificationRef = doc(db, 'boards', boardId, 'dense_modifications', modificationId);
+    const modificationRef = doc(
+      db,
+      'boards',
+      boardId,
+      'dense_modifications',
+      modificationId
+    );
     await updateDoc(modificationRef, { enabled });
 
     return { success: true };
   } catch (error) {
     console.error('Error toggling modification enabled status:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'Failed to toggle modification' };
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to toggle modification',
+    };
   }
 };

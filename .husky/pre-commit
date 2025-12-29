@@ -1,7 +1,35 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npx lint-staged
+# Run lint-staged (format staged files)
+echo "📝 Formatting staged files..."
+pnpm exec lint-staged || {
+  echo "❌ Lint-staged failed. Please fix formatting issues."
+  exit 1
+}
+
+# Run lint on entire project
+echo "🔍 Running lint on entire project..."
+pnpm run lint || {
+  echo "❌ Lint failed. Please fix linting errors before committing."
+  exit 1
+}
+
+# Run typecheck on entire project
+echo "🔍 Running typecheck..."
+pnpm run typecheck || {
+  echo "❌ Typecheck failed. Please fix type errors before committing."
+  exit 1
+}
+
+# Run tests (unit + snapshot)
+echo "🧪 Running tests (unit + snapshot)..."
+pnpm run test -- --passWithNoTests || {
+  echo "❌ Tests failed. Please fix failing tests before committing."
+  exit 1
+}
+
+echo "✅ All checks passed! (lint, typecheck, tests)"
 
 
 

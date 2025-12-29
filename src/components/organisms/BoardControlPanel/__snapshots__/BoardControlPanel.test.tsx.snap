@@ -1,0 +1,215 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BoardControlPanel should match snapshot 1`] = `
+<div>
+  <div
+    class="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-2 flex flex-col gap-1 items-center"
+  >
+    <button
+      aria-expanded="false"
+      aria-haspopup="menu"
+      class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10 rounded-full hover:opacity-80"
+      data-state="closed"
+      id="radix-:r0:"
+      style="color: rgb(146, 155, 201);"
+      type="button"
+    >
+      <svg
+        class="h-5 w-5"
+        fill="none"
+        height="1em"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+        />
+        <circle
+          cx="12"
+          cy="7"
+          r="4"
+        />
+      </svg>
+    </button>
+    <div
+      class="h-px w-full bg-white/10 my-1"
+    />
+    <button
+      class="p-3 hover:bg-white/20 transition-all rounded-xl relative "
+      title="History"
+    >
+      <svg
+        class="h-5 w-5"
+        fill="none"
+        height="1em"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        style="color: rgb(146, 155, 201);"
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+        <polyline
+          points="12 6 12 12 16 14"
+        />
+      </svg>
+    </button>
+  </div>
+  <div
+    aria-label="Notifications (F8)"
+    role="region"
+    style="pointer-events: none;"
+    tabindex="-1"
+  >
+    <ol
+      class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"
+      tabindex="-1"
+    />
+  </div>
+</div>
+`;
+
+exports[`BoardControlPanel should match snapshot with history open 1`] = `
+<div>
+  <div
+    class="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-2 flex flex-col gap-1 items-center"
+  >
+    <button
+      aria-expanded="false"
+      aria-haspopup="menu"
+      class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10 rounded-full hover:opacity-80"
+      data-state="closed"
+      id="radix-:r5:"
+      style="color: rgb(146, 155, 201);"
+      type="button"
+    >
+      <svg
+        class="h-5 w-5"
+        fill="none"
+        height="1em"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+        />
+        <circle
+          cx="12"
+          cy="7"
+          r="4"
+        />
+      </svg>
+    </button>
+    <div
+      class="h-px w-full bg-white/10 my-1"
+    />
+    <button
+      class="p-3 hover:bg-white/20 transition-all rounded-xl relative bg-primary"
+      title="History (5)"
+    >
+      <svg
+        class="h-5 w-5"
+        fill="none"
+        height="1em"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        style="color: white;"
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+        <polyline
+          points="12 6 12 12 16 14"
+        />
+      </svg>
+      <span
+        class="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-[10px] font-bold rounded-full bg-primary text-primary-foreground"
+      >
+        5
+      </span>
+    </button>
+  </div>
+  <div
+    aria-label="Notifications (F8)"
+    role="region"
+    style="pointer-events: none;"
+    tabindex="-1"
+  >
+    <ol
+      class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"
+      tabindex="-1"
+    />
+  </div>
+</div>
+`;
+
+exports[`BoardControlPanel should match snapshot without user 1`] = `
+<div>
+  <div
+    class="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-2 flex flex-col gap-1 items-center"
+  >
+    <button
+      class="p-3 hover:bg-white/20 transition-all rounded-xl relative "
+      title="History"
+    >
+      <svg
+        class="h-5 w-5"
+        fill="none"
+        height="1em"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        style="color: rgb(146, 155, 201);"
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+        <polyline
+          points="12 6 12 12 16 14"
+        />
+      </svg>
+    </button>
+  </div>
+  <div
+    aria-label="Notifications (F8)"
+    role="region"
+    style="pointer-events: none;"
+    tabindex="-1"
+  >
+    <ol
+      class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"
+      tabindex="-1"
+    />
+  </div>
+</div>
+`;

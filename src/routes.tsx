@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
-import { UsernameRegistration } from './components/UsernameRegistration';
-import { Loading } from './components/Loading';
+import { UsernameRegistration } from './components/organisms/UsernameRegistration';
+import { Loading } from './components/organisms/Loading';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { BoardPage } from './pages/BoardPage';
@@ -44,10 +44,3 @@ export const AppRoutes = () => {
     </>
   );
 };
-
-
-
-
-
-
-

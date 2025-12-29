@@ -25,6 +25,7 @@ const getPath = (ref: DocumentReference | Query): string => {
     // Query doesn't expose path directly, so we'll use a workaround
     try {
       // Try to access parent property (CollectionReference has path)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const parent = (ref as any).parent;
       if (parent && 'path' in parent) {
         return parent.path;
@@ -32,7 +33,7 @@ const getPath = (ref: DocumentReference | Query): string => {
     } catch {
       // Fallback to string parsing
     }
-    
+
     // Fallback: extract from query string representation
     try {
       const queryStr = ref.toString();
@@ -42,13 +43,13 @@ const getPath = (ref: DocumentReference | Query): string => {
       if (collectionMatch) {
         return collectionMatch[1];
       }
-      
+
       // Pattern 2: Query path (e.g., "Query(boards/123/dense_modifications)")
       const queryMatch = queryStr.match(/Query\(([^)]+)\)/);
       if (queryMatch) {
         return queryMatch[1];
       }
-      
+
       // Pattern 3: Extract path from string (e.g., "boards/123/dense_modifications")
       const pathMatch = queryStr.match(/(\/[^/\s]+(?:\/[^/\s]+)*)/);
       if (pathMatch) {
@@ -57,7 +58,7 @@ const getPath = (ref: DocumentReference | Query): string => {
     } catch {
       // If all parsing fails
     }
-    
+
     return 'unknown';
   }
 };
@@ -71,18 +72,18 @@ const getQueryDetails = (query: Query): string => {
   // We'll use toString() and parse what we can
   try {
     const queryStr = query.toString();
-    
+
     // Firestore query toString() format examples:
     // - Query(CollectionReference(users), where(username, ==, value))
     // - Query(CollectionReference(boards), where(isPublic, ==, true), orderBy(createdAt, desc))
-    
+
     // Pattern 1: where clauses - match "where(field, operator, value)"
     // More flexible pattern to catch various formats
     const wherePatterns = [
       /where\(([^,)]+),\s*([^,)]+),\s*([^)]+)\)/g, // where(field, op, value)
       /where\(([^)]+)\)/g, // where(...) - fallback
     ];
-    
+
     for (const pattern of wherePatterns) {
       const whereMatches = queryStr.matchAll(pattern);
       for (const match of whereMatches) {
@@ -100,21 +101,23 @@ const getQueryDetails = (query: Query): string => {
         }
       }
     }
-    
+
     // Pattern 2: orderBy with field and direction
-    const orderByMatches = queryStr.matchAll(/orderBy\(([^,)]+)(?:,\s*([^)]+))?\)/g);
+    const orderByMatches = queryStr.matchAll(
+      /orderBy\(([^,)]+)(?:,\s*([^)]+))?\)/g
+    );
     for (const match of orderByMatches) {
       const field = match[1].trim();
       const direction = match[2]?.trim() || 'asc';
       parts.push(`orderBy(${field}, ${direction})`);
     }
-    
+
     // Pattern 3: limit
     const limitMatches = queryStr.matchAll(/limit\((\d+)\)/g);
     for (const match of limitMatches) {
       parts.push(`limit(${match[1]})`);
     }
-    
+
     // Pattern 4: startAt/startAfter/endAt/endBefore
     if (queryStr.includes('startAt')) {
       parts.push('startAt(...)');
@@ -132,18 +135,20 @@ const getQueryDetails = (query: Query): string => {
     // If parsing fails, return a generic message
     return 'unable to parse constraints';
   }
-  
+
   if (parts.length === 0) {
     return 'no constraints';
   }
-  
+
   return parts.join(', ');
 };
 
 /**
  * Estimate data size in bytes (rough approximation)
  */
-const estimateDataSize = (snapshot: DocumentSnapshot | QuerySnapshot): number => {
+const estimateDataSize = (
+  snapshot: DocumentSnapshot | QuerySnapshot
+): number => {
   if ('docs' in snapshot) {
     // QuerySnapshot
     return snapshot.docs.reduce((total, doc) => {
@@ -169,10 +174,14 @@ export const getDoc = async <T = DocumentData>(
   firebaseLogger.log(`[getDoc] Starting: ${path}`);
 
   try {
-    const snapshot = await firebaseGetDoc(documentRef as DocumentReference<DocumentData>);
+    const snapshot = await firebaseGetDoc(
+      documentRef as DocumentReference<DocumentData>
+    );
     const duration = performance.now() - startTime;
     const exists = snapshot.exists();
-    const size = exists ? estimateDataSize(snapshot as DocumentSnapshot<DocumentData>) : 0;
+    const size = exists
+      ? estimateDataSize(snapshot as DocumentSnapshot<DocumentData>)
+      : 0;
 
     firebaseLogger.log(
       `[getDoc] ${path} | Duration: ${duration.toFixed(2)}ms | Exists: ${exists} | Size: ${size} bytes`
@@ -181,13 +190,14 @@ export const getDoc = async <T = DocumentData>(
     return snapshot as DocumentSnapshot<T>;
   } catch (error) {
     const duration = performance.now() - startTime;
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+
     firebaseLogger.error(
       `[getDoc] ${path} | Duration: ${duration.toFixed(2)}ms | Error: ${errorMessage}`,
       error
     );
-    
+
     throw error;
   }
 };
@@ -217,13 +227,14 @@ export const getDocs = async <T = DocumentData>(
     return snapshot as QuerySnapshot<T>;
   } catch (error) {
     const duration = performance.now() - startTime;
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+
     firebaseLogger.error(
       `[getDocs] ${path} | Query: ${queryDetails} | Duration: ${duration.toFixed(2)}ms | Error: ${errorMessage}`,
       error
     );
-    
+
     throw error;
   }
 };
@@ -254,9 +265,13 @@ export function onSnapshot<T = DocumentData>(
   onNext: any,
   onError?: (error: Error) => void
 ): Unsubscribe {
-  const path = getPath(reference as DocumentReference<DocumentData> | Query<DocumentData>);
+  const path = getPath(
+    reference as DocumentReference<DocumentData> | Query<DocumentData>
+  );
   const isQuery = !('path' in reference);
-  const queryDetails = isQuery ? getQueryDetails(reference as Query<DocumentData>) : undefined;
+  const queryDetails = isQuery
+    ? getQueryDetails(reference as Query<DocumentData>)
+    : undefined;
 
   firebaseLogger.log(
     `[onSnapshot] Setting up listener: ${path}${queryDetails ? ` | Query: ${queryDetails}` : ''}`
@@ -265,11 +280,13 @@ export function onSnapshot<T = DocumentData>(
   let initialSnapshotReceived = false;
   const startTime = performance.now();
 
-  const wrappedOnNext = (snapshot: DocumentSnapshot<DocumentData> | QuerySnapshot<DocumentData>) => {
+  const wrappedOnNext = (
+    snapshot: DocumentSnapshot<DocumentData> | QuerySnapshot<DocumentData>
+  ) => {
     if (!initialSnapshotReceived) {
       initialSnapshotReceived = true;
       const initialDuration = performance.now() - startTime;
-      
+
       if ('docs' in snapshot) {
         // QuerySnapshot
         const docCount = snapshot.docs.length;
@@ -300,9 +317,7 @@ export function onSnapshot<T = DocumentData>(
         onNext(snapshot as QuerySnapshot<T>);
       } else {
         const exists = snapshot.exists();
-        firebaseLogger.log(
-          `[onSnapshot] ${path} | Update | Exists: ${exists}`
-        );
+        firebaseLogger.log(`[onSnapshot] ${path} | Update | Exists: ${exists}`);
         onNext(snapshot as DocumentSnapshot<T>);
       }
     }
@@ -313,7 +328,7 @@ export function onSnapshot<T = DocumentData>(
       `[onSnapshot] ${path}${queryDetails ? ` | Query: ${queryDetails}` : ''} | Error:`,
       error
     );
-    
+
     if (onError) {
       onError(error);
     }
@@ -343,4 +358,3 @@ export function onSnapshot<T = DocumentData>(
     unsubscribe();
   };
 }
-

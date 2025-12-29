@@ -4,16 +4,16 @@ import { Board } from '@/types';
 import { getAllBoards } from '@/services/board.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { logPageView, logError } from '@/services/analytics.service';
-import { BoardList } from '@/components/BoardList';
-import { UserMenu } from '@/components/UserMenu';
-import { LoginButton } from '@/components/LoginButton';
-import { Button } from '@/components/ui/button';
+import { BoardList } from '@/components/organisms/BoardList';
+import { UserMenu } from '@/components/organisms/UserMenu';
+import { LoginButton } from '@/components/molecules/LoginButton';
+import { Button } from '@/components/atoms/ui/button';
 import { FiArrowLeft, FiSearch } from 'react-icons/fi';
 
 export const BrowseBoardPage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  
+
   const [boards, setBoards] = useState<Board[]>([]);
   const [filteredBoards, setFilteredBoards] = useState<Board[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,8 @@ export const BrowseBoardPage = () => {
         setFilteredBoards(allBoards);
       } catch (error) {
         console.error('Error fetching boards:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch boards';
+        const errorMessage =
+          error instanceof Error ? error.message : 'Failed to fetch boards';
         logError('Browse Boards Fetch Error', errorMessage, 'BrowseBoardPage');
       } finally {
         setLoading(false);
@@ -71,9 +72,18 @@ export const BrowseBoardPage = () => {
               >
                 <FiArrowLeft />
               </Button>
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-                <img src="/logo.svg" alt="tuval.space logo" className="size-8" />
-                <h1 className="text-2xl font-bold leading-tight tracking-tight">Browse Boards</h1>
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => navigate('/')}
+              >
+                <img
+                  src="/logo.svg"
+                  alt="tuval.space logo"
+                  className="size-8"
+                />
+                <h1 className="text-2xl font-bold leading-tight tracking-tight">
+                  Browse Boards
+                </h1>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -101,7 +111,8 @@ export const BrowseBoardPage = () => {
               </div>
             </div>
             <div className="text-sm text-slate-300">
-              {filteredBoards.length} board{filteredBoards.length !== 1 ? 's' : ''} found
+              {filteredBoards.length} board
+              {filteredBoards.length !== 1 ? 's' : ''} found
             </div>
           </div>
         </div>
@@ -114,4 +125,3 @@ export const BrowseBoardPage = () => {
     </div>
   );
 };
-

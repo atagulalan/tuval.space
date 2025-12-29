@@ -1,13 +1,21 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { User, Board } from '@/types';
-import { getUserByUsername, getUserBoards, invalidateUsernameCache } from '@/services/user.service';
+import {
+  getUserByUsername,
+  getUserBoards,
+  invalidateUsernameCache,
+} from '@/services/user.service';
 import { useAuth } from '@/contexts/AuthContext';
-import { logPageView, logButtonClick, logError } from '@/services/analytics.service';
-import { BoardList } from '@/components/BoardList';
-import { CreateBoardDialog } from '@/components/CreateBoardDialog';
-import { Loading } from '@/components/Loading';
-import { Button } from '@/components/ui/button';
+import {
+  logPageView,
+  logButtonClick,
+  logError,
+} from '@/services/analytics.service';
+import { BoardList } from '@/components/organisms/BoardList';
+import { CreateBoardDialog } from '@/components/organisms/CreateBoardDialog';
+import { Loading } from '@/components/organisms/Loading';
+import { Button } from '@/components/atoms/ui/button';
 import { FiArrowLeft, FiUser, FiRefreshCw, FiPlus } from 'react-icons/fi';
 import { config, getMaxPixelQuota } from '@/lib/config';
 import { useCachedImage } from '@/hooks/useCachedImage';
@@ -15,8 +23,13 @@ import { useCachedImage } from '@/hooks/useCachedImage';
 export const UserProfilePage = () => {
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
-  const { user: currentUser, firebaseUser: currentFirebaseUser, loading: authLoading, refreshUser } = useAuth();
-  
+  const {
+    user: currentUser,
+    firebaseUser: currentFirebaseUser,
+    loading: authLoading,
+    refreshUser,
+  } = useAuth();
+
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const [boards, setBoards] = useState<Board[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,10 +41,12 @@ export const UserProfilePage = () => {
     () => currentUser?.username === username,
     [currentUser?.username, username]
   );
-  
+
   // Cache profile photo to prevent 429 errors
   const cachedPhotoURL = useCachedImage(
-    isOwnProfile && currentFirebaseUser?.photoURL ? currentFirebaseUser.photoURL : null
+    isOwnProfile && currentFirebaseUser?.photoURL
+      ? currentFirebaseUser.photoURL
+      : null
   );
 
   // Track current username and mounted state to prevent race conditions
@@ -64,18 +79,18 @@ export const UserProfilePage = () => {
       } else {
         // For other users' profiles, fetch fresh data (cache already invalidated)
         const user = await getUserByUsername(username);
-        
+
         if (user) {
           setProfileUser(user);
           const userBoards = getUserBoards(user);
-          
+
           // Filter out private boards if viewing someone else's profile
-          const visibleBoards = userBoards.filter(board => {
+          const visibleBoards = userBoards.filter((board) => {
             if (board.isPublic) return true;
             if (currentUser && currentUser.uid === user.uid) return true;
             return false;
           });
-          
+
           setBoards(visibleBoards);
         } else {
           setProfileUser(null);
@@ -83,8 +98,11 @@ export const UserProfilePage = () => {
       }
     } catch (error) {
       console.error('Error refreshing profile:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to refresh profile';
-      logError('Profile Refresh Error', errorMessage, 'UserProfilePage', { username });
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to refresh profile';
+      logError('Profile Refresh Error', errorMessage, 'UserProfilePage', {
+        username,
+      });
     } finally {
       // Keep button disabled and spinning for 2 seconds after refresh completes
       refreshTimeoutRef.current = setTimeout(() => {
@@ -106,7 +124,10 @@ export const UserProfilePage = () => {
   // Analytics: Only log when username changes
   useEffect(() => {
     if (username) {
-      logPageView('User Profile Page', { username, is_own_profile: isOwnProfile });
+      logPageView('User Profile Page', {
+        username,
+        is_own_profile: isOwnProfile,
+      });
     }
   }, [username, isOwnProfile]);
 
@@ -148,7 +169,7 @@ export const UserProfilePage = () => {
       // Only fetch if we're sure it's not our own profile (auth has loaded and isOwnProfile is false)
       try {
         const user = await getUserByUsername(username);
-        
+
         // Check if still mounted and username hasn't changed (race condition prevention)
         if (!isMountedRef.current || currentUsernameRef.current !== username) {
           return;
@@ -158,14 +179,14 @@ export const UserProfilePage = () => {
           setProfileUser(user);
           // Get boards from denormalized user data (no additional query needed!)
           const userBoards = getUserBoards(user);
-          
+
           // Filter out private boards if viewing someone else's profile
-          const visibleBoards = userBoards.filter(board => {
+          const visibleBoards = userBoards.filter((board) => {
             if (board.isPublic) return true;
             if (currentUser && currentUser.uid === user.uid) return true;
             return false;
           });
-          
+
           setBoards(visibleBoards);
         } else {
           // User not found
@@ -177,8 +198,11 @@ export const UserProfilePage = () => {
           return;
         }
         console.error('Error fetching user data:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch user data';
-        logError('User Profile Fetch Error', errorMessage, 'UserProfilePage', { username });
+        const errorMessage =
+          error instanceof Error ? error.message : 'Failed to fetch user data';
+        logError('User Profile Fetch Error', errorMessage, 'UserProfilePage', {
+          username,
+        });
         setProfileUser(null);
       } finally {
         // Only update loading state if still mounted and username hasn't changed
@@ -194,11 +218,15 @@ export const UserProfilePage = () => {
     return () => {
       isMountedRef.current = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     username,
     authLoading,
     // Only depend on currentUser when viewing own profile to avoid unnecessary re-fetches
     // when viewing someone else's profile. isOwnProfile is derived from these, so we don't need it separately.
+    // Note: currentUser and isOwnProfile are intentionally excluded to prevent unnecessary re-fetches
+    // Complex expression is intentional - only depend on currentUser when viewing own profile
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     isOwnProfile ? currentUser : null,
   ]);
 
@@ -286,14 +314,14 @@ export const UserProfilePage = () => {
                   }}
                 />
               ) : null}
-              {!cachedPhotoURL && (
-                <FiUser className="h-12 w-12 text-primary" />
-              )}
+              {!cachedPhotoURL && <FiUser className="h-12 w-12 text-primary" />}
             </div>
             <div className="flex-1">
-              <h2 className="text-3xl font-bold mb-2 text-white">{profileUser.username}</h2>
+              <h2 className="text-3xl font-bold mb-2 text-white">
+                {profileUser.username}
+              </h2>
               <p className="text-slate-300 mb-4">{profileUser.email}</p>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-surface-dark rounded-lg p-4 border border-border-dark">
                   <p className="text-sm text-slate-300">Boards</p>
@@ -304,25 +332,19 @@ export const UserProfilePage = () => {
                 {isOwnProfile && (
                   <>
                     <div className="bg-surface-dark rounded-lg p-4 border border-border-dark">
-                      <p className="text-sm text-slate-300">
-                        Pixel Quota
-                      </p>
+                      <p className="text-sm text-slate-300">Pixel Quota</p>
                       <p className="text-2xl font-bold text-white">
                         {profileUser.pixelQuota}
                       </p>
                     </div>
                     <div className="bg-surface-dark rounded-lg p-4 border border-border-dark">
-                      <p className="text-sm text-slate-300">
-                        Max Quota
-                      </p>
+                      <p className="text-sm text-slate-300">Max Quota</p>
                       <p className="text-2xl font-bold text-white">
                         {getMaxPixelQuota()}
                       </p>
                     </div>
                     <div className="bg-surface-dark rounded-lg p-4 border border-border-dark">
-                      <p className="text-sm text-slate-300">
-                        Daily Refill
-                      </p>
+                      <p className="text-sm text-slate-300">Daily Refill</p>
                       <p className="text-2xl font-bold text-white">
                         {config.defaultPixelQuota}
                       </p>
@@ -371,7 +393,3 @@ export const UserProfilePage = () => {
     </div>
   );
 };
-
-
-
-

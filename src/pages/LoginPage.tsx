@@ -1,16 +1,16 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LoginButton } from '@/components/LoginButton';
+import { LoginButton } from '@/components/molecules/LoginButton';
 import { useAuth } from '@/contexts/AuthContext';
 import { logPageView } from '@/services/analytics.service';
-import { Loading } from '@/components/Loading';
+import { Loading } from '@/components/organisms/Loading';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/atoms/ui/card';
 
 export const LoginPage = () => {
   const { user, loading } = useAuth();
@@ -50,6 +50,3 @@ export const LoginPage = () => {
     </div>
   );
 };
-
-
-

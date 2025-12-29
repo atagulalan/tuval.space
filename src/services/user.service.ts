@@ -12,7 +12,7 @@ import { db, getDoc, getDocs } from '@/lib/firebase';
 import { User, Board } from '@/types';
 import { config, getMaxPixelQuota } from '@/lib/config';
 import { createBoard } from './board.service';
-import { COLOR_PALETTES } from '@/components/ColorPicker';
+import { COLOR_PALETTES } from '@/components/molecules/ColorPicker';
 import { isFirebaseError, FIREBASE_ERROR_CODES } from '@/types/errors';
 import { logger } from '@/lib/logger';
 
@@ -70,7 +70,7 @@ export const getUserByUsername = async (
 ): Promise<User | null> => {
   try {
     const cacheKey = username.toLowerCase();
-    
+
     // Check cache first
     const cached = usernameCache.get(cacheKey);
     if (cached) {
@@ -93,8 +93,8 @@ export const getUserByUsername = async (
     const q = query(usersRef, where('username', '==', username));
     const querySnapshot = await getDocs(q);
 
-    const user: User | null = querySnapshot.empty 
-      ? null 
+    const user: User | null = querySnapshot.empty
+      ? null
       : (querySnapshot.docs[0].data() as User);
 
     // Store in cache
@@ -114,7 +114,7 @@ export const getUser = async (uid: string): Promise<User | null> => {
   try {
     const userDocRef = doc(db, 'users', uid);
     const userDoc = await getDoc(userDocRef);
-    
+
     if (!userDoc.exists()) {
       return null;
     }
@@ -126,7 +126,9 @@ export const getUser = async (uid: string): Promise<User | null> => {
       (error.code === FIREBASE_ERROR_CODES.UNAVAILABLE ||
         error.message.includes('offline'))
     ) {
-      logger('user').warn('⚠️ Firestore offline, attempting to use cached data');
+      logger('user').warn(
+        '⚠️ Firestore offline, attempting to use cached data'
+      );
       // Return null to trigger username registration flow or retry
       return null;
     }
@@ -174,7 +176,7 @@ export const createUser = async (
       undefined, // specialEventPixels
       defaultPalette // customPalette
     );
-    
+
     // Update user with board object (denormalized for performance)
     await updateDoc(doc(db, 'users', uid), {
       boards: [board],
@@ -212,7 +214,7 @@ export const resetDailyQuota = async (user: User): Promise<User> => {
     const now = Timestamp.now();
     const lastReset = user.lastQuotaReset.toDate();
     const currentDate = new Date();
-    
+
     // Check if we're on a different day
     if (
       lastReset.getDate() !== currentDate.getDate() ||
@@ -290,6 +292,3 @@ export const addBoardToUser = async (
     throw error;
   }
 };
-
-
-

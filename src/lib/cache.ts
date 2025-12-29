@@ -13,6 +13,7 @@ interface CacheEntry<T> {
 }
 
 class CacheStore {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private cache = new Map<CacheKey, CacheEntry<any>>();
   private tagIndex = new Map<CacheTag, Set<CacheKey>>();
 
@@ -138,7 +139,10 @@ export const CACHE_TAGS = {
  * Invalidate user profile cache
  */
 export const invalidateUserProfile = (uid: string): void => {
-  cacheStore.invalidateTags([CACHE_TAGS.USER_PROFILE(uid), CACHE_TAGS.USER_BOARDS(uid)]);
+  cacheStore.invalidateTags([
+    CACHE_TAGS.USER_PROFILE(uid),
+    CACHE_TAGS.USER_BOARDS(uid),
+  ]);
 };
 
 /**
@@ -154,7 +158,3 @@ export const invalidateBoard = (boardId: string): void => {
 export const invalidateAllBoards = (): void => {
   cacheStore.invalidateTags([CACHE_TAGS.ALL_BOARDS]);
 };
-
-
-
-

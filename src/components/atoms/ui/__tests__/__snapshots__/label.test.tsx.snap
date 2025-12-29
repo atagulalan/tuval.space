@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Label should match snapshot 1`] = `
+<div>
+  <label
+    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+    for="test"
+  >
+    Test Label
+  </label>
+</div>
+`;
+
+exports[`Label should match snapshot without htmlFor 1`] = `
+<div>
+  <label
+    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+  >
+    Standalone Label
+  </label>
+</div>
+`;

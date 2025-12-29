@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/atoms/ui/button';
+import { Input } from '@/components/atoms/ui/input';
+import { Label } from '@/components/atoms/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { createBoard } from '@/services/board.service';
 import { addBoardToUser, canUserCreateBoard } from '@/services/user.service';
@@ -11,7 +11,7 @@ import { validateBoardName } from '@/lib/utils';
 import { logPageView } from '@/services/analytics.service';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
-import { Loading } from '@/components/Loading';
+import { Loading } from '@/components/organisms/Loading';
 
 // Convert hex color to RGB
 function hexToRgb(hex: string): [number, number, number] {
@@ -27,7 +27,10 @@ function hexToRgb(hex: string): [number, number, number] {
 }
 
 // Calculate Euclidean distance between two RGB colors
-function colorDistance(rgb1: [number, number, number], rgb2: [number, number, number]): number {
+function colorDistance(
+  rgb1: [number, number, number],
+  rgb2: [number, number, number]
+): number {
   const [r1, g1, b1] = rgb1;
   const [r2, g2, b2] = rgb2;
   return Math.sqrt((r2 - r1) ** 2 + (g2 - g1) ** 2 + (b2 - b1) ** 2);
@@ -59,12 +62,17 @@ export const ImportPngPage = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   const [boardName, setBoardName] = useState('');
   const [pixelArray, setPixelArray] = useState<string[][] | null>(null);
-  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [imageDimensions, setImageDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const [imagePalette, setImagePalette] = useState<string[] | null>(null);
-  const [draggedColorIndex, setDraggedColorIndex] = useState<number | null>(null);
+  const [draggedColorIndex, setDraggedColorIndex] = useState<number | null>(
+    null
+  );
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +82,11 @@ export const ImportPngPage = () => {
   }, []);
 
   // K-means clustering to reduce colors to 8
-  const kMeans = (colors: string[], k: number, maxIterations = 10): string[] => {
+  const kMeans = (
+    colors: string[],
+    k: number,
+    maxIterations = 10
+  ): string[] => {
     if (colors.length <= k) {
       return colors;
     }
@@ -96,12 +108,14 @@ export const ImportPngPage = () => {
     // K-means iterations
     for (let iteration = 0; iteration < maxIterations; iteration++) {
       // Assign each color to nearest centroid
-      const clusters: number[][] = Array(k).fill(0).map(() => []);
-      
+      const clusters: number[][] = Array(k)
+        .fill(0)
+        .map(() => []);
+
       colorRgbs.forEach((rgb, idx) => {
         let minDistance = Infinity;
         let nearestCentroid = 0;
-        
+
         centroids.forEach((centroid, cIdx) => {
           const distance = colorDistance(rgb, centroid);
           if (distance < minDistance) {
@@ -109,7 +123,7 @@ export const ImportPngPage = () => {
             nearestCentroid = cIdx;
           }
         });
-        
+
         clusters[nearestCentroid].push(idx);
       });
 
@@ -117,27 +131,29 @@ export const ImportPngPage = () => {
       let centroidsChanged = false;
       clusters.forEach((cluster, cIdx) => {
         if (cluster.length === 0) return; // Skip empty clusters
-        
-        let sumR = 0, sumG = 0, sumB = 0;
+
+        let sumR = 0,
+          sumG = 0,
+          sumB = 0;
         cluster.forEach((colorIdx) => {
           const rgb = colorRgbs[colorIdx];
           sumR += rgb[0];
           sumG += rgb[1];
           sumB += rgb[2];
         });
-        
+
         const newCentroid: [number, number, number] = [
           Math.round(sumR / cluster.length),
           Math.round(sumG / cluster.length),
           Math.round(sumB / cluster.length),
         ];
-        
+
         // Check if centroid changed
         const oldCentroid = centroids[cIdx];
         if (colorDistance(oldCentroid, newCentroid) > 0.1) {
           centroidsChanged = true;
         }
-        
+
         centroids[cIdx] = newCentroid;
       });
 
@@ -184,12 +200,13 @@ export const ImportPngPage = () => {
         const g = data[idx + 1];
         const b = data[idx + 2];
         const a = data[idx + 3];
-        
+
         // Skip fully transparent pixels
         if (a < 128) continue;
-        
+
         // Convert to hex
-        const hex = `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
+        const hex =
+          `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
         colorSet.add(hex);
       }
     }
@@ -234,7 +251,7 @@ export const ImportPngPage = () => {
 
     // Extract unique colors from image
     const uniqueColors = extractImageColors(image);
-    
+
     // Reduce to 8 colors using k-means
     const reducedPalette = kMeans(uniqueColors, 8);
     setImagePalette(reducedPalette);
@@ -301,7 +318,9 @@ export const ImportPngPage = () => {
     // Canvas drawing will be handled by useEffect
   };
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -335,7 +354,9 @@ export const ImportPngPage = () => {
 
       URL.revokeObjectURL(imageUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Resim işlenirken bir hata oluştu');
+      setError(
+        err instanceof Error ? err.message : 'Resim işlenirken bir hata oluştu'
+      );
       setPixelArray(null);
       setImageDimensions(null);
       setImagePalette(null);
@@ -425,7 +446,11 @@ export const ImportPngPage = () => {
       navigate(`/board/${board.name}`);
     } catch (err) {
       console.error('Board creation error:', err);
-      setError(err instanceof Error ? err.message : 'Board oluşturulurken bir hata oluştu');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Board oluşturulurken bir hata oluştu'
+      );
     } finally {
       setIsCreating(false);
     }
@@ -440,9 +465,14 @@ export const ImportPngPage = () => {
       <div className="min-h-screen bg-background-dark text-white font-['Space_Grotesk',sans-serif]">
         <header className="sticky top-0 z-50 w-full border-b border-solid border-border-dark bg-background-dark/80 backdrop-blur-md">
           <div className="flex items-center justify-between whitespace-nowrap px-4 py-3 max-w-[1200px] mx-auto w-full">
-            <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate('/')}>
+            <div
+              className="flex items-center gap-4 cursor-pointer"
+              onClick={() => navigate('/')}
+            >
               <img src="/logo.svg" alt="tuval.space logo" className="size-8" />
-              <h2 className="text-lg font-bold leading-tight tracking-tight">tuval.space</h2>
+              <h2 className="text-lg font-bold leading-tight tracking-tight">
+                tuval.space
+              </h2>
             </div>
             <Button variant="ghost" onClick={() => navigate('/login')}>
               Giriş Yap
@@ -465,9 +495,14 @@ export const ImportPngPage = () => {
       {/* Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-solid border-border-dark bg-background-dark/80 backdrop-blur-md">
         <div className="flex items-center justify-between whitespace-nowrap px-4 py-3 max-w-[1200px] mx-auto w-full">
-          <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate('/')}>
+          <div
+            className="flex items-center gap-4 cursor-pointer"
+            onClick={() => navigate('/')}
+          >
             <img src="/logo.svg" alt="tuval.space logo" className="size-8" />
-            <h2 className="text-lg font-bold leading-tight tracking-tight">tuval.space</h2>
+            <h2 className="text-lg font-bold leading-tight tracking-tight">
+              tuval.space
+            </h2>
           </div>
           <Button variant="ghost" onClick={() => navigate('/')}>
             Ana Sayfa
@@ -504,7 +539,9 @@ export const ImportPngPage = () => {
                   <p className="text-sm text-destructive mt-2">{error}</p>
                 )}
                 {isProcessing && (
-                  <p className="text-sm text-muted-foreground mt-2">İşleniyor...</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    İşleniyor...
+                  </p>
                 )}
               </div>
 
@@ -531,7 +568,8 @@ export const ImportPngPage = () => {
                       {imageDimensions.width} × {imageDimensions.height} piksel
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Toplam: {imageDimensions.width * imageDimensions.height} piksel
+                      Toplam: {imageDimensions.width * imageDimensions.height}{' '}
+                      piksel
                     </p>
                   </div>
 
@@ -550,38 +588,51 @@ export const ImportPngPage = () => {
                             }}
                             onDrop={(e) => {
                               e.preventDefault();
-                              if (draggedColorIndex !== null && draggedColorIndex !== idx) {
+                              if (
+                                draggedColorIndex !== null &&
+                                draggedColorIndex !== idx
+                              ) {
                                 const newPalette = [...imagePalette];
-                                const [removed] = newPalette.splice(draggedColorIndex, 1);
+                                const [removed] = newPalette.splice(
+                                  draggedColorIndex,
+                                  1
+                                );
                                 newPalette.splice(idx, 0, removed);
                                 setImagePalette(newPalette);
-                                
+
                                 // Update pixel array with new palette order
                                 if (pixelArray) {
                                   const updatedArray = pixelArray.map((row) =>
                                     row.map((oldColor) => {
                                       // Find old index
-                                      const oldIndex = imagePalette.indexOf(oldColor);
+                                      const oldIndex =
+                                        imagePalette.indexOf(oldColor);
                                       if (oldIndex === -1) return oldColor;
-                                      
+
                                       // Map to new index
                                       let newIndex = oldIndex;
                                       if (draggedColorIndex < idx) {
                                         // Moving forward
                                         if (oldIndex === draggedColorIndex) {
                                           newIndex = idx;
-                                        } else if (oldIndex > draggedColorIndex && oldIndex <= idx) {
+                                        } else if (
+                                          oldIndex > draggedColorIndex &&
+                                          oldIndex <= idx
+                                        ) {
                                           newIndex = oldIndex - 1;
                                         }
                                       } else {
                                         // Moving backward
                                         if (oldIndex === draggedColorIndex) {
                                           newIndex = idx;
-                                        } else if (oldIndex >= idx && oldIndex < draggedColorIndex) {
+                                        } else if (
+                                          oldIndex >= idx &&
+                                          oldIndex < draggedColorIndex
+                                        ) {
                                           newIndex = oldIndex + 1;
                                         }
                                       }
-                                      
+
                                       return newPalette[newIndex];
                                     })
                                   );
@@ -645,4 +696,3 @@ export const ImportPngPage = () => {
     </div>
   );
 };
-

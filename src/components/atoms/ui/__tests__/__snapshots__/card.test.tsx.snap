@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Card should match snapshot 1`] = `
+<div>
+  <div
+    class="rounded-lg border bg-card text-card-foreground"
+  >
+    <div
+      class="flex flex-col space-y-1.5 p-6"
+    >
+      <h3
+        class="text-2xl font-semibold leading-none tracking-tight"
+      >
+        Card Title
+      </h3>
+      <p
+        class="text-sm text-muted-foreground"
+      >
+        Card description
+      </p>
+    </div>
+    <div
+      class="p-6 pt-0"
+    >
+      <p>
+        Card content
+      </p>
+    </div>
+    <div
+      class="flex items-center p-6 pt-0"
+    >
+      <p>
+        Footer
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Card should match snapshot with minimal content 1`] = `
+<div>
+  <div
+    class="rounded-lg border bg-card text-card-foreground"
+  >
+    <div
+      class="p-6 pt-0"
+    >
+      <p>
+        Simple card
+      </p>
+    </div>
+  </div>
+</div>
+`;
