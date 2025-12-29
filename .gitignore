@@ -36,6 +36,3 @@ coverage
 
 # Storybook
 storybook-static
-
-# Node Modules
-node_modules
