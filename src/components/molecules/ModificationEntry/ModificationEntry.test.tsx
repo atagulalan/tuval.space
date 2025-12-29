@@ -2,6 +2,26 @@ import { describe, it, expect } from '@jest/globals';
 import { render } from '@testing-library/react';
 import { ModificationEntry } from './ModificationEntry';
 import { DenseModification, Board } from '@/types';
+
+// Mock firebase/firestore
+jest.mock('firebase/firestore', () => ({
+  Timestamp: {
+    now: jest.fn(() => ({
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: 0,
+      toDate: jest.fn(() => new Date()),
+      toMillis: jest.fn(() => Date.now()),
+    })),
+    fromDate: jest.fn((date) => ({
+      seconds: Math.floor(date.getTime() / 1000),
+      nanoseconds: 0,
+      toDate: jest.fn(() => date),
+      toMillis: jest.fn(() => date.getTime()),
+    })),
+  },
+}));
+
+// Import Timestamp after mock
 import { Timestamp } from 'firebase/firestore';
 
 // Mock modification service

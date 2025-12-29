@@ -12,7 +12,12 @@ const meta: Meta<typeof BoardControlPanel> = {
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <MockAuthProvider>
           <Story />
           <Toaster />

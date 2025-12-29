@@ -10,7 +10,12 @@ const meta: Meta<typeof UserMenu> = {
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <MockAuthProvider>
           <Story />
           <Toaster />

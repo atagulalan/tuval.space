@@ -1,7 +1,28 @@
 import React, { createContext, useContext, ReactNode, useState } from 'react';
 import { User as FirebaseUser } from 'firebase/auth';
 import { User } from '@/types';
-import { Timestamp } from 'firebase/firestore';
+
+// Mock Timestamp for tests
+const Timestamp = {
+  now: () =>
+    ({
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: 0,
+      toDate: () => new Date(),
+      toMillis: () => Date.now(),
+      isEqual: () => false,
+      toJSON: () => ({}),
+    }) as any,
+  fromDate: (date: Date) =>
+    ({
+      seconds: Math.floor(date.getTime() / 1000),
+      nanoseconds: 0,
+      toDate: () => date,
+      toMillis: () => date.getTime(),
+      isEqual: () => false,
+      toJSON: () => ({}),
+    }) as any,
+};
 
 interface AuthContextType {
   firebaseUser: FirebaseUser | null;

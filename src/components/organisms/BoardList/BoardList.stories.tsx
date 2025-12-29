@@ -47,7 +47,12 @@ const meta: Meta<typeof BoardList> = {
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Story />
       </MemoryRouter>
     ),

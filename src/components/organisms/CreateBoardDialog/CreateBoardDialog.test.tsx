@@ -38,7 +38,12 @@ jest.mock('@/services/analytics.service', () => ({
 describe('CreateBoardDialog', () => {
   it('should match snapshot when closed', () => {
     const { container } = render(
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <MockAuthProvider>
           <CreateBoardDialog open={false} onOpenChange={() => {}} />
           <Toaster />
@@ -50,7 +55,12 @@ describe('CreateBoardDialog', () => {
 
   it('should match snapshot when open', () => {
     const { container } = render(
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <MockAuthProvider>
           <CreateBoardDialog open={true} onOpenChange={() => {}} />
           <Toaster />

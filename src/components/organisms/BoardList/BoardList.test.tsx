@@ -33,7 +33,12 @@ const mockBoards: Board[] = [
 describe('BoardList', () => {
   it('should match snapshot', () => {
     const { container } = render(
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <BoardList boards={mockBoards} loading={false} />
       </MemoryRouter>
     );
@@ -42,7 +47,12 @@ describe('BoardList', () => {
 
   it('should match snapshot when loading', () => {
     const { container } = render(
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <BoardList boards={[]} loading={true} />
       </MemoryRouter>
     );
@@ -51,7 +61,12 @@ describe('BoardList', () => {
 
   it('should match snapshot when empty', () => {
     const { container } = render(
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <BoardList boards={[]} loading={false} />
       </MemoryRouter>
     );

@@ -29,7 +29,12 @@ jest.mock('@/hooks/useCachedImage', () => ({
 describe('UserMenu', () => {
   it('should match snapshot', () => {
     const { container } = render(
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <MockAuthProvider>
           <UserMenu />
           <Toaster />
@@ -41,7 +46,12 @@ describe('UserMenu', () => {
 
   it('should match snapshot with board variant', () => {
     const { container } = render(
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <MockAuthProvider>
           <UserMenu variant="board" />
           <Toaster />
@@ -53,7 +63,12 @@ describe('UserMenu', () => {
 
   it('should match snapshot with hideCreateBoard', () => {
     const { container } = render(
-      <MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <MockAuthProvider>
           <UserMenu hideCreateBoard={true} />
           <Toaster />
