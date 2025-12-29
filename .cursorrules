@@ -1,0 +1,74 @@
+# tuval.space Cursor Rules
+
+## Project Overview
+- Collaborative pixel art platform built with React, TypeScript, Firebase, and Tailwind CSS
+- Users receive daily pixel quotas to place pixels on shared boards
+- Real-time updates and change history tracking
+
+## Code Style
+- Use TypeScript strict mode
+- Follow functional component patterns with hooks
+- Use Tailwind CSS for styling (no inline styles)
+- Prefer named exports over default exports (except for pages)
+- Use absolute imports with @ alias for src/
+
+## File Organization
+- Components: `/src/components/`
+- UI Components: `/src/components/ui/` (shadcn/ui)
+- Pages: `/src/pages/`
+- Services: `/src/services/`
+- Hooks: `/src/hooks/`
+- Types: `/src/types/`
+- Utils: `/src/lib/`
+
+## Firebase
+- Use modular Firebase SDK imports
+- All Firebase operations should have try-catch blocks
+- Use real-time listeners for live data
+- Respect Firestore security rules
+
+## State Management
+- Use React Context for global state (auth)
+- Use local state for component-specific data
+- Use custom hooks for reusable state logic
+
+## Testing
+- Write unit tests for services and utilities
+- Use Jest for testing
+- Mock Firebase in tests
+
+## Git Workflow
+- Follow conventional commits (feat, fix, docs, style, refactor, test, chore)
+- All commits must pass linting and tests via husky hooks
+- Keep commits atomic and focused
+
+## Performance
+- Lazy load pages where possible
+- Optimize canvas rendering with requestAnimationFrame
+- Use Firestore queries efficiently to minimize reads
+- Implement proper cleanup in useEffect hooks
+
+## Accessibility
+- Use semantic HTML
+- Include ARIA labels where needed
+- Ensure keyboard navigation works
+- Maintain color contrast ratios
+
+## Do NOT
+- Edit translation files manually (tr.json, en.json)
+- Commit sensitive data or API keys
+- Use any/unknown types without good reason
+- Skip error handling
+- Create components without TypeScript types
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,166 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function hasPixelQuota() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.pixelQuota > 0;
+    }
+    
+    function isValidUsername(username) {
+      return username.size() >= 3 && 
+             username.size() <= 20 && 
+             username.matches('^[a-zA-Z0-9_-]+$');
+    }
+    
+    function isValidColor(color) {
+      return color.matches('^#[0-9A-F]{6}$');
+    }
+    
+    function isValidBoardDimensions(width, height) {
+      return width > 0 && 
+             height > 0 && 
+             width * height <= 400000;
+    }
+    
+    function isBoardOwner(boardId) {
+      return isAuthenticated() && 
+             request.auth.uid == get(/databases/$(database)/documents/boards/$(boardId)).data.ownerId;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Anyone can read user profiles
+      allow read: if true;
+      
+      // Only the user can create their own profile
+      allow create: if isOwner(userId) && 
+                      isValidUsername(request.resource.data.username) &&
+                      request.resource.data.boards.size() <= 10 &&
+                      request.resource.data.pixelQuota >= 0;
+      
+      // Only the user can update their own profile
+      allow update: if isOwner(userId) &&
+                      request.resource.data.boards.size() <= 10 &&
+                      request.resource.data.pixelQuota >= 0;
+      
+      // Users cannot delete their profiles
+      allow delete: if false;
+    }
+    
+    // Boards collection
+    match /boards/{boardId} {
+      // Public boards can be read by anyone, private boards only by the owner
+      allow read: if resource.data.isPublic == true || 
+                    (isAuthenticated() && request.auth.uid == resource.data.ownerId);
+      
+      // Only authenticated users can create boards
+      allow create: if isAuthenticated() && 
+                      request.resource.data.ownerId == request.auth.uid &&
+                      isValidBoardDimensions(
+                        request.resource.data.width,
+                        request.resource.data.height
+                      );
+      
+      // Only the owner can update their board
+      allow update: if isOwner(resource.data.ownerId);
+      
+      // Only the owner can delete their board
+      allow delete: if isOwner(resource.data.ownerId);
+      
+      // Dense modifications subcollection (event source)
+      match /dense_modifications/{modificationId} {
+        // Public boards: anyone can read, private boards: only owner
+        allow read: if get(/databases/$(database)/documents/boards/$(boardId)).data.isPublic == true ||
+                      (isAuthenticated() && request.auth.uid == get(/databases/$(database)/documents/boards/$(boardId)).data.ownerId);
+        
+        // Only authenticated users can create dense modifications
+        allow create: if isAuthenticated() &&
+                        request.resource.data.userId == request.auth.uid &&
+                        request.resource.data.boardId == boardId &&
+                        request.resource.data.x is int &&
+                        request.resource.data.y is int &&
+                        request.resource.data.w is int &&
+                        request.resource.data.h is int &&
+                        request.resource.data.pixels is string &&
+                        request.resource.data.pixels.size() > 0 &&
+                        request.resource.data.changedPixelsCount is int &&
+                        request.resource.data.changedPixelsCount >= 0 &&
+                        request.resource.data.changedPixelsCount <= request.resource.data.w * request.resource.data.h &&
+                        request.resource.data.enabled is bool;
+        
+        // Users can update their own modifications (e.g., to disable them)
+        // Board owners can update any modification's enabled field
+        allow update: if isAuthenticated() &&
+                        ((resource.data.userId == request.auth.uid &&
+                          request.resource.data.userId == request.auth.uid) ||
+                         (isBoardOwner(boardId) &&
+                          request.resource.data.enabled is bool &&
+                          // Only allow changing enabled field, preserve other fields
+                          request.resource.data.id == resource.data.id &&
+                          request.resource.data.boardId == resource.data.boardId &&
+                          request.resource.data.x == resource.data.x &&
+                          request.resource.data.y == resource.data.y &&
+                          request.resource.data.w == resource.data.w &&
+                          request.resource.data.h == resource.data.h &&
+                          request.resource.data.pixels == resource.data.pixels &&
+                          request.resource.data.changedPixelsCount == resource.data.changedPixelsCount &&
+                          request.resource.data.userId == resource.data.userId &&
+                          request.resource.data.username == resource.data.username &&
+                          request.resource.data.createdAt == resource.data.createdAt));
+        
+        // Modifications cannot be deleted (immutable event log)
+        allow delete: if false;
+      }
+      
+      // Modifications subcollection (legacy - kept for backward compatibility)
+      match /modifications/{batchId} {
+        // Public boards: anyone can read, private boards: only owner
+        allow read: if get(/databases/$(database)/documents/boards/$(boardId)).data.isPublic == true ||
+                      (isAuthenticated() && request.auth.uid == get(/databases/$(database)/documents/boards/$(boardId)).data.ownerId);
+        
+        // Only authenticated users can create modification batches
+        allow create: if isAuthenticated() &&
+                        request.resource.data.userId == request.auth.uid &&
+                        hasPixelQuota();
+        
+        // Users can only update their own batches (append pixels)
+        allow update: if isAuthenticated() &&
+                        resource.data.userId == request.auth.uid &&
+                        request.resource.data.userId == request.auth.uid;
+        
+        // Modifications cannot be deleted (immutable event log)
+        allow delete: if false;
+      }
+      
+      // Changes subcollection (legacy - kept for backward compatibility)
+      match /changes/{changeId} {
+        // Public boards: anyone can read, private boards: only owner
+        allow read: if get(/databases/$(database)/documents/boards/$(boardId)).data.isPublic == true ||
+                      (isAuthenticated() && request.auth.uid == get(/databases/$(database)/documents/boards/$(boardId)).data.ownerId);
+        
+        // Only authenticated users can create changes
+        allow create: if isAuthenticated() &&
+                        request.resource.data.userId == request.auth.uid;
+        
+        // Users can update changes to dismiss them
+        allow update: if isAuthenticated() &&
+                        request.resource.data.isDismissedBy is list;
+        
+        // Changes cannot be deleted
+        allow delete: if false;
+      }
+    }
+  }
+}
+
+
+
