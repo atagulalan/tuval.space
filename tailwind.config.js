@@ -51,6 +51,9 @@ export default {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        'background-dark': 'hsl(222, 47%, 7%)',
+        'surface-dark': 'hsl(222, 47%, 10%)',
+        'border-dark': 'hsl(217, 33%, 24%)',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -75,4 +78,3 @@ export default {
   },
   plugins: [],
 };
-
